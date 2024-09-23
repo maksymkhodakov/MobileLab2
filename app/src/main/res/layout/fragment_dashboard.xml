@@ -12,7 +12,7 @@
         android:layout_height="66dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="220dp"
-        android:text="    Курси студентів"
+        android:text=" Студенти однокласники"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
         android:layout_marginEnd="112dp"
-        android:text="Середній бал"
+        android:text="Склали"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/text_dashboard" />
 

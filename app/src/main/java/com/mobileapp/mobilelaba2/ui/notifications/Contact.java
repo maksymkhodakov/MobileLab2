@@ -1,10 +1,9 @@
 package com.mobileapp.mobilelaba2.ui.notifications;
 
 public class Contact {
-    private String name;
-
-    private String surname;
-    private String number;
+    private final String name;
+    private final String surname;
+    private final String number;
 
     public Contact(String name, String surname, String number) {
         this.name = name;

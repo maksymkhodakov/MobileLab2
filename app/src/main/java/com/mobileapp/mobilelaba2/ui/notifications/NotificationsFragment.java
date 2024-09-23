@@ -36,11 +36,10 @@ public class NotificationsFragment extends Fragment {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
             // Якщо дозвіл не наданий, викличе запит на дозвіл
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
-                    REQUEST_READ_CONTACTS_PERMISSION);
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS_PERMISSION);
         } else {
             // Якщо дозвіл вже наданий, відображення контактів
-            List<Contact> ivanContacts = getContactsWithFatherName();
+            List<Contact> ivanContacts = getContactsByName("Ivan");
 
             RecyclerView recyclerView = view.findViewById(R.id.recyclerViewContact);
             recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -49,7 +48,7 @@ public class NotificationsFragment extends Fragment {
         }
     }
 
-    public List<Contact> getContactsWithFatherName() {
+    public List<Contact> getContactsByName(String nameToSearch) {
         List<Contact> contacts = new ArrayList<>();
 
         String[] projection = {
@@ -57,8 +56,9 @@ public class NotificationsFragment extends Fragment {
                 ContactsContract.CommonDataKinds.Phone.NUMBER
         };
 
+        // Оновлення selection для пошуку контакту з конкретним ім'ям
         String selection = "UPPER(" + ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + ") LIKE ?";
-        String[] selectionArgs = {"% % %"};
+        String[] selectionArgs = {nameToSearch.toUpperCase() + "%"};  // Пошук по імені, не враховуючи регістр
 
         Cursor cursor = requireContext().getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -71,15 +71,13 @@ public class NotificationsFragment extends Fragment {
         if (cursor != null) {
             try {
                 int displayNameIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-                 int phoneNumberIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER);
-
+                int phoneNumberIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER);
                 while (cursor.moveToNext()) {
                     String contactName = cursor.getString(displayNameIndex);
                     String contactNumber = cursor.getString(phoneNumberIndex);
                     contacts.add(new Contact(contactName, " ", contactNumber));
                 }
             } catch (IllegalArgumentException e) {
-                // Обробка помилки, якщо вказано невірний стовпець
                 e.printStackTrace();
             } finally {
                 cursor.close();

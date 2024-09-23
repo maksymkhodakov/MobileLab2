@@ -31,9 +31,9 @@ public class StudentsCoursesAdapter extends RecyclerView.Adapter<StudentCoursesH
     public void onBindViewHolder(@NonNull StudentCoursesHolder holder, int position) {
         holder.pibView.setText(studentCourses.get(position).getPib());
         holder.nameView.setText(studentCourses.get(position).getName());
-        holder.gradesView.setText(studentCourses.get(position).getGrade());
-        holder.addressView.setText(studentCourses.get(position).getAdress());
-        String id = "    " + studentCourses.get(position).getId() ;
+        holder.gradesView.setText((studentCourses.get(position).getStudentAVGGrade()));
+        holder.addressView.setText(studentCourses.get(position).getAddress());
+        String id = "    " + studentCourses.get(position).getId();
         holder.idView.setText(id);
     }
 

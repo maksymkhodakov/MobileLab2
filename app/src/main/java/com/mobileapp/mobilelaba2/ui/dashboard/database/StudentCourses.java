@@ -4,25 +4,25 @@ public class StudentCourses {
     private int id;
     private String pib;
     private String name;
-    private String grade;
-    private String adress;
+    private String grade1;
+    private String grade2;
+    private String address;
 
-    public StudentCourses(){
+    public String getStudentAVGGrade() {
+        final double grade1 = Double.parseDouble(this.getGrade1());
+        final double grade2 = Double.parseDouble(this.getGrade2());
+        return String.valueOf((grade1 + grade2) / 2);
     }
 
-    public StudentCourses(String pib, String name, String grade, String adress) {
+    public StudentCourses() {
+    }
+
+    public StudentCourses(String pib, String name, String grade1, String grade2, String address) {
         this.pib = pib;
         this.name = name;
-        this.grade = grade;
-        this.adress = adress;
-    }
-
-    public StudentCourses(int Id, String pib, String grade1, String grade2, String adress) {
-        this.id = id;
-        this.pib = pib;
-        this.name = grade1;
-        this.grade = grade2;
-        this.adress = adress;
+        this.grade1 = grade1;
+        this.grade2 = grade2;
+        this.address = address;
     }
 
     public int getId() {
@@ -45,23 +45,31 @@ public class StudentCourses {
         return name;
     }
 
-    public void setName(String grade1) {
-        this.name = grade1;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getGrade() {
-        return grade;
+    public String getGrade1() {
+        return grade1;
     }
 
-    public void setGrade(String grade2) {
-        this.grade = grade2;
+    public void setGrade1(String grade1) {
+        this.grade1 = grade1;
     }
 
-    public String getAdress() {
-        return adress;
+    public String getGrade2() {
+        return grade2;
     }
 
-    public void setAdress(String adress) {
-        this.adress = adress;
+    public void setGrade2(String grade2) {
+        this.grade2 = grade2;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DBManager extends SQLiteOpenHelper {
     public DBManager(@Nullable Context context) {
@@ -32,37 +33,20 @@ public class DBManager extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put(Constants.COLUMN_NAME_PIB, studentCourses.getPib());
         cv.put(Constants.COLUMN_NAME_NAME, studentCourses.getName());
-        cv.put(Constants.COLUMN_NAME_GRADE, studentCourses.getGrade());
-        cv.put(Constants.COLUMN_NAME_ADDRESS, studentCourses.getAdress());
+        cv.put(Constants.COLUMN_NAME_GRADE_1, studentCourses.getGrade1());
+        cv.put(Constants.COLUMN_NAME_GRADE_2, studentCourses.getGrade2());
+        cv.put(Constants.COLUMN_NAME_ADDRESS, studentCourses.getAddress());
 
         db.insert(Constants.TABLE_NAME, null, cv);
         db.close();
     }
 
-/*    public void deleteStudent(int studentId) {
+    public void deleteAllStudents() {
+        final List<Integer> ids = getAllStudents().stream().map(StudentCourses::getId).collect(Collectors.toList());
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(Constants.TABLE_NAME, Constants.COLUMN_NAME_ID + " = ?",
-                new String[]{String.valueOf(studentId)});
+        ids.forEach(id -> db.delete(Constants.TABLE_NAME, Constants.COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)}));
         db.close();
     }
-
-    public StudentCourses getStudent(int id){
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.query(Constants.TABLE_NAME,
-                new String[] {Constants.COLUMN_NAME_ID, Constants.COLUMN_NAME_PIB,
-                        Constants.COLUMN_NAME_NAME, Constants.COLUMN_NAME_GRADE,
-                        Constants.COLUMN_NAME_ADDRESS},
-                Constants.COLUMN_NAME_ID + "=?",
-                new String[]{String.valueOf(id)}, null, null, null, null);
-        if (cursor!=null){
-            cursor.moveToFirst();
-        }
-        StudentCourses studentCourses = new StudentCourses(Integer.parseInt(cursor.getString(0)),
-                 cursor.getString(1), cursor.getString(2),
-                cursor.getString(3), cursor.getString(4));
-        db.close();
-        return studentCourses;
-    }*/
 
     public List<StudentCourses> getAllStudents() {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -77,21 +61,21 @@ public class DBManager extends SQLiteOpenHelper {
                 studentCourses.setId(Integer.parseInt(cursor.getString(0)));
                 studentCourses.setPib(cursor.getString(1));
                 studentCourses.setName(cursor.getString(2));
-                studentCourses.setGrade(cursor.getString(3));
-                studentCourses.setAdress(cursor.getString(4));
+                studentCourses.setGrade1(cursor.getString(3));
+                studentCourses.setGrade2(cursor.getString(4));
+                studentCourses.setAddress(cursor.getString(5));
                 studentCoursesList.add(studentCourses);
             } while(cursor.moveToNext());
         }
         return studentCoursesList;
     }
 
-    public List<StudentCourses> getStudentsAbove60() {
+    public List<StudentCourses> getStudentsWithAverageAbove60() {
         List<StudentCourses> studentsAbove60 = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
         String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME +
-                " WHERE (" + Constants.COLUMN_NAME_GRADE + ") > 60" +
-                " AND (" + Constants.COLUMN_NAME_PIB + ") = 'Кондратюк Ю.В.'";
+                " WHERE (" + Constants.COLUMN_NAME_GRADE_1 + " + " + Constants.COLUMN_NAME_GRADE_2 + ") / 2 > 60";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -101,8 +85,9 @@ public class DBManager extends SQLiteOpenHelper {
                 studentCourses.setId(Integer.parseInt(cursor.getString(0)));
                 studentCourses.setPib(cursor.getString(1));
                 studentCourses.setName(cursor.getString(2));
-                studentCourses.setGrade(cursor.getString(3));
-                studentCourses.setAdress(cursor.getString(4));
+                studentCourses.setGrade1(cursor.getString(3));
+                studentCourses.setGrade2(cursor.getString(4));
+                studentCourses.setAddress(cursor.getString(5));
                 studentsAbove60.add(studentCourses);
             } while (cursor.moveToNext());
         }
@@ -111,19 +96,9 @@ public class DBManager extends SQLiteOpenHelper {
         return studentsAbove60;
     }
 
-    public double getAverageGrade() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT AVG(" + Constants.COLUMN_NAME_GRADE + ") FROM " + Constants.TABLE_NAME;
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        double averageGrade = 0;
-
-        if (cursor != null && cursor.moveToFirst()) {
-            averageGrade = cursor.getDouble(0);
-            cursor.close();
-        }
-
-        return averageGrade;
+    public double getAverageSelectedPercentage() {
+        final double allSize = getAllStudents().size();
+        final double above60Avg = getStudentsWithAverageAbove60().size();
+        return above60Avg / allSize * 100;
     }
-
 }

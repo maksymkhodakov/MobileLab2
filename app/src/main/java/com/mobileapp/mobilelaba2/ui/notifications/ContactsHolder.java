@@ -8,9 +8,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mobileapp.mobilelaba2.R;
 
-public class MyContactsHolder extends RecyclerView.ViewHolder {
-    TextView contactNameSurnameView, numberView;
-    public MyContactsHolder(@NonNull View itemView) {
+public class ContactsHolder extends RecyclerView.ViewHolder {
+    TextView contactNameSurnameView;
+    TextView numberView;
+
+    public ContactsHolder(@NonNull View itemView) {
         super(itemView);
         contactNameSurnameView = itemView.findViewById(R.id.contactNameSurname);
         numberView = itemView.findViewById(R.id.contactNumber);
