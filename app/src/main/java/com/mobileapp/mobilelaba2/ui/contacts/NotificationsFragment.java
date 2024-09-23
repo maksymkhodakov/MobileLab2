@@ -1,4 +1,4 @@
-package com.mobileapp.mobilelaba2.ui.notifications;
+package com.mobileapp.mobilelaba2.ui.contacts;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -51,7 +51,8 @@ public class NotificationsFragment extends Fragment {
     public List<Contact> getContactsByName(String nameToSearch) {
         List<Contact> contacts = new ArrayList<>();
 
-        String[] projection = {
+        String[] phoneProjection = {
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,  // Додано ID контакту
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                 ContactsContract.CommonDataKinds.Phone.NUMBER
         };
@@ -62,7 +63,7 @@ public class NotificationsFragment extends Fragment {
 
         Cursor cursor = requireContext().getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                projection,
+                phoneProjection,
                 selection,
                 selectionArgs,
                 null
@@ -70,12 +71,20 @@ public class NotificationsFragment extends Fragment {
 
         if (cursor != null) {
             try {
+                int contactIdIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
                 int displayNameIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
                 int phoneNumberIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER);
+
                 while (cursor.moveToNext()) {
+                    String contactId = cursor.getString(contactIdIndex);  // Отримання ID контакту
                     String contactName = cursor.getString(displayNameIndex);
                     String contactNumber = cursor.getString(phoneNumberIndex);
-                    contacts.add(new Contact(contactName, " ", contactNumber));
+
+                    // Отримуємо адресу контакту
+                    String contactAddress = getContactAddress(contactId);
+
+                    // Додаємо контакт з адресою
+                    contacts.add(new Contact(contactName, " ", contactNumber, contactAddress));
                 }
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
@@ -85,5 +94,39 @@ public class NotificationsFragment extends Fragment {
         }
 
         return contacts;
+    }
+
+    // Метод для отримання адреси контакту за його ID
+    private String getContactAddress(String contactId) {
+        String address = null;
+        String[] addressProjection = {
+                ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS
+        };
+
+        String addressSelection = ContactsContract.CommonDataKinds.StructuredPostal.CONTACT_ID + " = ?";
+        String[] addressSelectionArgs = {contactId};
+
+        Cursor addressCursor = requireContext().getContentResolver().query(
+                ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_URI,
+                addressProjection,
+                addressSelection,
+                addressSelectionArgs,
+                null
+        );
+
+        if (addressCursor != null) {
+            try {
+                if (addressCursor.moveToFirst()) {  // Перевіряємо, чи є адреса у контакту
+                    int addressIndex = addressCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS);
+                    address = addressCursor.getString(addressIndex);
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } finally {
+                addressCursor.close();
+            }
+        }
+
+        return address;
     }
 }

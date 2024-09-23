@@ -1,4 +1,4 @@
-package com.mobileapp.mobilelaba2.ui.notifications;
+package com.mobileapp.mobilelaba2.ui.contacts;
 
 import android.content.Context;
 import android.view.LayoutInflater;
